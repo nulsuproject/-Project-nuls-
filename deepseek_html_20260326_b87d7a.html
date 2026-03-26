@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Биография | projectnuls</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            transition: background 0.5s ease, color 0.3s ease;
+            position: relative;
+        }
+
+        /* ========== СТИЛИ ВРЕМЕН ГОДА ========== */
+        body.season-spring {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #1e3a2f;
+        }
+        body.season-summer {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b5 100%);
+            color: #b64926;
+        }
+        body.season-autumn {
+            background: linear-gradient(135deg, #ffefdb 0%, #ffdec2 100%);
+            color: #8b3c1c;
+        }
+        body.season-winter {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdef5 100%);
+            color: #1e4a6b;
+        }
+
+        /* главная карточка */
+        .card {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(15, 20, 30, 0.85);
+            backdrop-filter: blur(16px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 200, 0.2);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        /* шапка */
+        .header {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.2rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.4);
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff, #ffd966);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .header p {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        /* панель настроек */
+        .settings-panel {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.8rem 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+            border-bottom: 1px solid rgba(255, 255, 200, 0.2);
+        }
+        .season-btn {
+            background: rgba(25, 35, 50, 0.8);
+            border: none;
+            padding: 0.45rem 1.2rem;
+            border-radius: 2rem;
+            color: #f0f0f0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            font-size: 0.85rem;
+            backdrop-filter: blur(4px);
+        }
+        .season-btn:hover {
+            transform: translateY(-2px);
+            background: #3a5a7a;
+        }
+        .season-btn.active-season {
+            background: #ffaa33;
+            color: #1e2a2a;
+            box-shadow: 0 2px 12px rgba(255, 170, 51, 0.5);
+        }
+
+        /* навигация */
+        .nav-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.4);
+            gap: 0;
+        }
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 0.9rem 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            color: #ffdd88;
+            border-bottom-color: #ffaa33;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .tab-btn:hover:not(.active) {
+            background: rgba(255, 255, 200, 0.1);
+            color: #fff;
+        }
+
+        /* контент */
+        .tab-pane {
+            display: none;
+            padding: 1.8rem;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* блок биографии */
+        .bio-block {
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: 1.2rem;
+            padding: 1.3rem;
+            font-family: 'JetBrains Mono', monospace;
+            border-left: 4px solid #ffaa55;
+        }
+        .bio-row {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0.6rem 0;
+            border-bottom: 1px dashed rgba(255, 220, 150, 0.3);
+            align-items: baseline;
+        }
+        .bio-label {
+            min-width: 115px;
+            font-weight: 700;
+            color: #ffcc77;
+            font-size: 0.9rem;
+        }
+        .bio-value {
+            color: #f5f5f5;
+            word-break: break-word;
+            font-size: 0.9rem;
+        }
+        .bio-value a {
+            color: #7bc5ff;
+            text-decoration: none;
+            border-bottom: 1px dotted #7bc5ff;
+        }
+        .skill-badge {
+            background: #2a4a5a;
+            display: inline-block;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-right: 8px;
+            margin-top: 4px;
+            font-family: monospace;
+        }
+        .quote {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #ffcc88;
+            font-family: monospace;
+        }
+
+        /* игры */
+        .games-block {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+        }
+        .games-block h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .brawl-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #3a7a5a, #1e4a3a);
+            padding: 0.9rem 2rem;
+            margin: 1rem 0;
+            border-radius: 60px;
+            text-decoration: none;
+            font-weight: bold;
+            color: white;
+            transition: 0.2s;
+            border: 1px solid #ffcc66;
+            font-family: inherit;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .brawl-link:active {
+            transform: scale(0.97);
+        }
+        .game-info {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.5);
+            text-align: center;
+            padding: 0.7rem;
+            font-size: 0.7rem;
+            font-family: monospace;
+        }
+
+        /* анимации падающих элементов (легкие, не лагают) */
+        .falling-item {
+            position: fixed;
+            pointer-events: none;
+            font-size: 20px;
+            z-index: 9999;
+            will-change: transform;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 550px) {
+            .bio-label { min-width: 85px; }
+            .tab-pane { padding: 1.2rem; }
+            .card { margin: 0; }
+        }
+    </style>
+</head>
+<body class="season-autumn">
+
+<div class="card">
+    <div class="header">
+        <h1>📖 projectnuls / биография</h1>
+        <p>✧ живой профиль | настройки стиля ✧</p>
+    </div>
+
+    <div class="settings-panel">
+        <button class="season-btn" data-season="spring">🌸 ВЕСНА</button>
+        <button class="season-btn" data-season="summer">☀️ ЛЕТО</button>
+        <button class="season-btn" data-season="autumn">🍂 ОСЕНЬ</button>
+        <button class="season-btn" data-season="winter">❄️ ЗИМА</button>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" data-tab="bio">📄 БИОГРАФИЯ</button>
+        <button class="tab-btn" data-tab="games">🎮 ИГРЫ</button>
+    </div>
+
+    <!-- БИОГРАФИЯ -->
+    <div id="bio" class="tab-pane active">
+        <div class="bio-block">
+            <div class="bio-row">
+                <span class="bio-label">👤 Имя:</span>
+                <span class="bio-value">Artem (projectnuls)</span>
+            </div>
+            <div class="bio-row">
+                <span class="bio-label">🎂 Возраст:</span>
+                <span class="bio-value">11 лет</span>
+            </div>
+            <div class="bio-row">
+                <span class="bio-label">🛠 Проекты:</span>
+                <span class="bio-value">Telegram боты, Minecraft сервер, веб-эксперименты</span>
+            </div>
+            <div class="bio-row">
+                <span class="bio-label">📢 Канал:</span>
+                <span class="bio-value"><a href="https://t.me/bionulsu" target="_blank">t.me/bionulsu</a></span>
+            </div>
+            <div class="bio-row">
+                <span class="bio-label">📒 Бот:</span>
+                <span class="bio-value"><a href="https://t.me/Projectnuls_bot" target="_blank">@Projectnuls_bot</a></span>
+            </div>
+            <div class="bio-row">
+                <span class="bio-label">🎮 MC Сервер:</span>
+                <span class="bio-value">LuniarWorld.aternos.me</span>
+            </div>
+            <div class="bio-row">
+                <span class="bio-label">💻 Навыки:</span>
+                <span class="bio-value">
+                    <span class="skill-badge">Python</span>
+                    <span class="skill-badge">HTML/CSS</span>
+                    <span class="skill-badge">Telegram API</span>
+                    <span class="skill-badge">Git</span>
+                </span>
+            </div>
+            <div class="bio-row">
+                <span class="bio-label">✉️ Контакты:</span>
+                <span class="bio-value"><a href="https://t.me/nulgv">@nulgv</a> &nbsp;|&nbsp; <a href="https://t.me/nulsu">@nulsu</a></span>
+            </div>
+            <div class="quote">
+                ╔══════════════════════╗<br>
+                ║  🔥 кодю с душой 🔥  ║<br>
+                ╚══════════════════════╝
+            </div>
+            <div style="font-size:0.75rem; margin-top: 12px; opacity:0.8;">✨ создаю ботов, сервера и полезные штуки. projectnuls — моё творческое пространство ✨</div>
+        </div>
+    </div>
+
+    <!-- ИГРЫ -->
+    <div id="games" class="tab-pane">
+        <div class="games-block">
+            <h3>🎮 BRAWL STARS</h3>
+            <p style="margin-bottom: 8px;"><strong>твой отчим</strong> ждёт тебя в друзьях!</p>
+            <a class="brawl-link" href="https://link.brawlstars.com/invite/friend/ru?tag=2CU2P299VC&token=ckh9dpds" target="_blank">
+                ➕ ДОБАВИТЬ В ДРУЗЬЯ
+            </a>
+            <div class="game-info">
+                🏷️ Тег игрока: <strong>#2CU2P299VC</strong><br>
+                🎮 Minecraft сервер: <strong>LuniarWorld.aternos.me</strong><br>
+                🤖 Бот: <strong>@Projectnuls_bot</strong> — игры и развлечения<br>
+                📢 Канал: <strong>@bionulsu</strong>
+            </div>
+            <p style="margin-top: 12px; font-size:0.8rem;">✨ играем каждый день, залетай на сервер и в бравл! ✨</p>
+        </div>
+    </div>
+
+    <footer>✧ projectnuls | биография с душой ✧</footer>
+</div>
+
+<script>
+    // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const panes = document.querySelectorAll('.tab-pane');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.getAttribute('data-tab');
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            panes.forEach(pane => pane.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+
+    // ========== СТИЛИ ВРЕМЕН ГОДА И ПАДАЮЩИЕ ЭЛЕМЕНТЫ (ОПТИМИЗИРОВАНО) ==========
+    const bodyEl = document.body;
+    let currentSeason = 'autumn';
+    let fallingElements = [];
+    let animationFrame = null;
+    
+    function getSeasonEmoji(season) {
+        if(season === 'spring') return ['🌸', '🌼', '🌱', '🌷'];
+        if(season === 'summer') return ['☀️', '✨', '⭐', '🌻'];
+        if(season === 'autumn') return ['🍁', '🍂', '🍃', '🌾'];
+        if(season === 'winter') return ['❄️', '☃️', '⛄', '✨'];
+        return ['🍁'];
+    }
+    
+    function getParticleCount() {
+        // оптимизация: на мобилке меньше
+        const isMobile = window.innerWidth < 700;
+        if(currentSeason === 'winter') return isMobile ? 25 : 40;
+        if(currentSeason === 'autumn') return isMobile ? 28 : 45;
+        return isMobile ? 20 : 35;
+    }
+    
+    function createFallingElement() {
+        const emojis = getSeasonEmoji(currentSeason);
+        const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+        const div = document.createElement('div');
+        div.className = 'falling-item';
+        div.textContent = emoji;
+        div.style.left = Math.random() * window.innerWidth + 'px';
+        div.style.top = '-30px';
+        div.style.fontSize = (Math.random() * 16 + 16) + 'px';
+        div.style.opacity = Math.random() * 0.5 + 0.4;
+        div.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))';
+        const duration = Math.random() * 5 + 4; // 4-9 секунд
+        const sway = Math.random() * 40 - 20;
+        div.style.transition = `transform ${duration}s linear, top ${duration}s linear`;
+        div.style.transform = `translateX(${sway}px)`;
+        document.body.appendChild(div);
+        
+        // анимация падения
+        requestAnimationFrame(() => {
+            div.style.top = window.innerHeight + 50 + 'px';
+        });
+        
+        // удалить после окончания
+        setTimeout(() => {
+            if(div && div.remove) div.remove();
+        }, duration * 1000);
+        
+        return div;
+    }
+    
+    let intervalId = null;
+    
+    function startFallingEffect() {
+        if(intervalId) clearInterval(intervalId);
+        const count = getParticleCount();
+        // создаем начальные элементы
+        for(let i = 0; i < Math.min(count, 15); i++) {
+            setTimeout(() => createFallingElement(), i * 150);
+        }
+        // интервал создания новых
+        intervalId = setInterval(() => {
+            const currentCount = document.querySelectorAll('.falling-item').length;
+            const maxCount = getParticleCount() + 5;
+            if(currentCount < maxCount) {
+                createFallingElement();
+            }
+        }, 800);
+    }
+    
+    function stopFallingEffect() {
+        if(intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+        }
+        document.querySelectorAll('.falling-item').forEach(el => el.remove());
+    }
+    
+    function applySeason(season) {
+        currentSeason = season;
+        bodyEl.className = `season-${season}`;
+        
+        // обновляем активную кнопку
+        document.querySelectorAll('.season-btn').forEach(btn => {
+            if(btn.getAttribute('data-season') === season) {
+                btn.classList.add('active-season');
+            } else {
+                btn.classList.remove('active-season');
+            }
+        });
+        
+        // перезапускаем падающие элементы
+        stopFallingEffect();
+        startFallingEffect();
+    }
+    
+    // слушатели для кнопок сезонов
+    document.querySelectorAll('.season-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const season = btn.getAttribute('data-season');
+            applySeason(season);
+        });
+    });
+    
+    // при изменении размера окна — не ломаем анимацию
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            stopFallingEffect();
+            startFallingEffect();
+        }, 200);
+    });
+    
+    // старт с осени
+    applySeason('autumn');
+    
+    // чистим при уходе со страницы (на всякий случай)
+    window.addEventListener('beforeunload', () => {
+        if(intervalId) clearInterval(intervalId);
+    });
+    
+    // дополнительный эффект: легкий градиент на карточке под сезон
+    const card = document.querySelector('.card');
+    function updateCardGlow() {
+        if(!card) return;
+        const season = currentSeason;
+        let glow = '';
+        if(season === 'spring') glow = '0 0 15px rgba(100,200,100,0.2)';
+        if(season === 'summer') glow = '0 0 20px rgba(255,200,100,0.3)';
+        if(season === 'autumn') glow = '0 0 15px rgba(255,140,50,0.25)';
+        if(season === 'winter') glow = '0 0 15px rgba(100,180,255,0.25)';
+        card.style.boxShadow = `0 25px 45px rgba(0,0,0,0.3), ${glow}`;
+    }
+    
+    // наблюдаем за сменой сезона через mutationObserver (просто обновляем)
+    const observer = new MutationObserver(() => updateCardGlow());
+    observer.observe(bodyEl, { attributes: true, attributeFilter: ['class'] });
+    updateCardGlow();
+    
+    console.log('✅ Биография загружена | плавные анимации без лагов');
+</script>
+</body>
+</html>
